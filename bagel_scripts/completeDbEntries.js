@@ -84,4 +84,54 @@ pool.query(query, (err, res) => {
 });
 
 
+function tenify(num) {
+	if(num < 10) {
+		return "0" + num;
+	}
+	return num.toString();
+}
+
+function populate(cat_id, subcat_id) {
+	total_trials += 1;
+	const query = `UPDATE tossups SET subcategory_id = ${subcat_id} WHERE category_id = ${cat_id} AND subcategory_id IS NULL`;
+	pool.query(query, (err2, res2) => {
+		if(res2) {
+			rows_affected += res2.rowCount;
+			console.log(`[Subcategories-Tossups]`.bold + " <> UPDATE".yellow.bold + ` (Rows affected: ${res2.rowCount})`.grey);
+		} else {
+			console.log(`[Subcategories-Tossups]`.bold + " ! UPDATE FAILED".red.bold + ` {${query}}`.bold);
+		}
+
+	});
+
+
+	const query2 = `UPDATE bonuses SET subcategory_id = ${subcat_id} WHERE category_id = ${cat_id} AND subcategory_id IS NULL`;
+	pool.query(query2, (err2, res2) => {
+		if(res2) {
+			rows_affected += res2.rowCount;
+			console.log(`[Subcategories-Bonuses]`.bold + " <> UPDATE".yellow.bold + ` (Rows affected: ${res2.rowCount})`.grey);
+		} else {
+			console.log(`[Subcategories-Bonuses]`.bold + " ! UPDATE FAILED".red.bold + ` {${query2}}`.bold);
+		}
+
+	});
+}
+
+pool.query("SELECT id, name FROM categories", (err, res) => {
+	res.rows.forEach(({id, name}) => {
+		var misc_subcat_id = "1" + tenify(id);
+		pool.query("SELECT * FROM subcategories WHERE id = " + misc_subcat_id, (err, res) => {
+			if(res && res.rows) {
+				if(res.rows.length === 0) {
+					pool.query(`INSERT INTO subcategories(id, name, category_id, created_at, updated_at) VALUES (${misc_subcat_id}, '${name} - Misc', ${id}, NOW(), NOW())`, (err, res) => {
+						populate(id, misc_subcat_id);
+					});
+				} else {
+					populate(id, misc_subcat_id);
+				}
+			}
+		});
+	})
+})
+
 
