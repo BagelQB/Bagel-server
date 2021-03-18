@@ -1,0 +1,36 @@
+{
+  "name": "bagel-server",
+  "version": "1.0.0",
+  "description": "The glorious back end of the Bagel QB app.",
+  "main": "server.js",
+  "scripts": {
+    "test": "mocha",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BagelQB/Bagel-server.git"
+  },
+  "keywords": [
+    "Bagel",
+    "Quizbowl",
+    "PK",
+    "TK",
+    "Multiplayer",
+    "QB",
+    "Competitive"
+  ],
+  "author": "Michael Karpov & Eamin Ahmed",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/BagelQB/Bagel-server/issues"
+  },
+  "homepage": "https://github.com/BagelQB/Bagel-server#readme",
+  "devDependencies": {
+    "chai": "^4.3.4",
+    "mocha": "^8.3.2"
+  },
+  "dependencies": {
+    "pg": "^8.5.1"
+  }
+}
