@@ -478,53 +478,6 @@ describe('Bagel Services', function () {
 
        })
 
-       describe('#getPartsForBonus(bonus_id:int)', function() {
-            const test1 = 4011 // ok
-            const test2 = 2713 // ok
-            const test3 = 51324536 // error code 1
-            const test4 = "test" // error code 2
-
-            it(`Return bonus ${test1}`, function(done) {
-                questionService.getPartsForBonus(test1).then(({status, result}) => {
-                    if(status === "ok") {
-                        done();
-                    } else {
-                        done("returned status 'fail'");
-                    }
-                })
-            })
-
-            it(`Return bonus ${test2}`, function(done) {
-                questionService.getPartsForBonus(test2).then(({status, result}) => {
-                    if(status === "ok") {
-                        done();
-                    } else {
-                        done("returned status 'fail'");
-                    }
-                })
-            })
-
-            it(`Error code 1 for ${test3}`, function(done) {
-                questionService.getPartsForBonus(test3).then(({status, result}) => {
-                    if(status === "fail" && result.error_code === 1) {
-                        done();
-                    } else {
-                        done("returned status 'ok'");
-                    }
-                })
-            })
-
-            it(`Error code 2 for ${test4}`, function(done) {
-                questionService.getPartsForBonus(test4).then(({status, result}) => {
-                    if(status === "fail" && result.error_code === 2) {
-                        done();
-                    } else {
-                        done("returned status 'ok'");
-                    }
-                })
-            })
-
-       });
 
     });
 
