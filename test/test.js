@@ -7,9 +7,16 @@
 
 */
 
+let chai = require('chai');
+let chaiHttp = require('chai-http');
+let should = chai.should();
 
-var questionService = require('../bagel_modules/questionService');
-var translatorService = require('../bagel_modules/translatorService');
+const questionService = require('../bagel_modules/questionService');
+const translatorService = require('../bagel_modules/translatorService');
+const expressService = require('../bagel_modules/expressService');
+expressService.run();
+chai.use(chaiHttp);
+
 
 describe('Bagel Services', function () {
     describe('questionService', function () {
@@ -481,7 +488,6 @@ describe('Bagel Services', function () {
 
     });
 
-
     describe('translatorService', function () {
         describe('#tournamentFromID()', function() {
 
@@ -552,5 +558,71 @@ describe('Bagel Services', function () {
 
 
     })
+
+    describe('expressService', function () {
+
+
+        it('Cold starts express server', function(done) {
+            if(expressService.server) {
+                done();
+            } else {
+
+                console.log("   - Some tests were not run because the express server could not start.".red.bold);
+                done("Express server did not start on port 8080");
+            }
+
+        });
+
+
+
+        it('Returns 200 on path "/"', function(done) {
+            this.timeout(5000);
+            if(!expressService.server) {done("Express server did not start")}
+            else {
+                chai.request(expressService.app)
+                    .get('/')
+                    .end((err, res) => {
+                        res.should.have.status(200);
+                        done();
+                    });
+            }
+        });
+
+
+        it('Returns a tossup on path "/api/tossups?type=id&id=59771"', function(done) {
+            this.timeout(5000);
+            if(!expressService.server) {done("Express server did not start")}
+            else {
+                chai.request(expressService.app)
+                    .get('/api/tossups?type=id&id=59771')
+                    .end((err, res) => {
+                        res.should.have.status(200);
+                        done();
+                    });
+            }
+        });
+
+        it('Returns a bonus on path "/api/bonuses?type=id&id=498"', function(done) {
+            this.timeout(5000);
+            if(!expressService.server) {done("Express server did not start")}
+            else {
+                chai.request(expressService.app)
+                    .get('/api/bonuses?type=id&id=498')
+                    .end((err, res) => {
+                        res.should.have.status(200);
+                        done();
+                    });
+            }
+        });
+
+        //http://localhost:8080/api/tossups?type=id&id=59771 - mindanao
+
+
+        afterEach(function(){
+            expressService.server.close();
+        })
+
+
+    });
 })
 
