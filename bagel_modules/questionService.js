@@ -1,7 +1,8 @@
 const Pool = require('pg').Pool
 qService = {};
 
-var translatorService = require('./translatorService');
+const translatorService = require('./translatorService');
+const errors = require('./errors.json');
 
 // SERVICE TO RETRIEVE QUESTIONS
 
@@ -21,11 +22,11 @@ qService.getTossupByID = (id) => {
 				if(res.rows[0]) {
 					resolve({status: "ok", result: res.rows[0]});
 				} else {
-					resolve({status: "fail", result: {error_code: 1}});
+					resolve({status: "fail", result: errors["1"]});
 				}
 			});
 		} else {
-			resolve({status: "fail", result: {error_code: 2}});
+			resolve({status: "fail", result: errors["2"]});
 		}
 	});
 }
@@ -37,11 +38,11 @@ qService.getTossupsBySubcatID = (subcat_id, limit) => {
 				if(res.rows[0]) {
 					resolve({status: "ok", result: res.rows});
 				} else {
-					resolve({status: "fail", result: {error_code: 1}});
+					resolve({status: "fail", result: errors["1"]});
 				}
 			});
 		} else {
-			resolve({status: "fail", result: {error_code: 2}});
+			resolve({status: "fail", result: errors["2"]});
 		}
 	});
 }
@@ -53,11 +54,11 @@ qService.getTossupsByCategoryID = (cat_id, limit) => {
 				if(res.rows[0]) {
 					resolve({status: "ok", result: res.rows});
 				} else {
-					resolve({status: "fail", result: {error_code: 1}});
+					resolve({status: "fail", result: errors["1"]});
 				}
 			});
 		} else {
-			resolve({status: "fail", result: {error_code: 2}});
+			resolve({status: "fail", result: errors["2"]});
 		}
 	});
 }
@@ -74,13 +75,13 @@ qService.getTossupsByParameters = (difficulty_list, subcat_id_list, limit) => {
 				if(res && res.rows && res.rows[0]) {
 					resolve({status: "ok", result: res.rows});
 				} else {
-					resolve({status: "fail", result: {error_code: 1}});
+					resolve({status: "fail", result: errors["1"]});
 				}
 
 			});
 
 		} else {
-			resolve({status: "fail", result: {error_code: 2}});
+			resolve({status: "fail", result: errors["2"]});
 		}
 	});
 }
@@ -98,11 +99,11 @@ qService.getBonusByID = (id) => {
 
 					
 				} else {
-					resolve({status: "fail", result: {error_code: 1}});
+					resolve({status: "fail", result: errors["1"]});
 				}
 			});
 		} else {
-			resolve({status: "fail", result: {error_code: 2}});
+			resolve({status: "fail", result: errors["2"]});
 		}
 	});
 }
@@ -119,13 +120,13 @@ qService.getBonusesByParameters = (difficulty_list, subcat_id_list, limit) => {
 				if(res && res.rows && res.rows[0]) {
 					resolve({status: "ok", result: res.rows});
 				} else {
-					resolve({status: "fail", result: {error_code: 1}});
+					resolve({status: "fail", result: errors["1"]});
 				}
 
 			});
 
 		} else {
-			resolve({status: "fail", result: {error_code: 2}});
+			resolve({status: "fail", result: errors["2"]});
 		}
 	});
 }

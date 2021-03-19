@@ -1,0 +1,9 @@
+{
+  "0": {
+    "error_code": 0, "error_desc": "Could not establish connection"
+  },
+  "1": {
+    "error_code": 1, "error_desc": "No data found matching parameters"},
+  "2": {
+    "error_code": 2, "error_desc": "Invalid parameters"}
+}
