@@ -3,7 +3,7 @@ const colors = require('colors'); // for ease of debugging
 const pool = new Pool({
   user: 'postgres',
   host: 'localhost',
-  database: 'betterqb',
+  database: 'BagelQB',
   password: 'postgres',
   port: 5432,
 });
