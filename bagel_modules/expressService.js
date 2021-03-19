@@ -6,7 +6,7 @@ const app = express();
 
 const questionService = require('./questionService');
 
-
+let errors = require('./errors.json');
 
 function sendQuestions(res, status, result) {
     if (status === 'ok') {
@@ -15,11 +15,15 @@ function sendQuestions(res, status, result) {
             data: result
         });
     } else if (status === 'fail') {
-        res.json({
-            message: 'error',
-            error_code: result.error_code
-        });
+        sendError(result.error_code, res);
     }
+}
+
+function sendError(code, res) {
+    res.json({
+        message: 'error',
+        error: errors[code]
+    });
 }
 
 let server = app.listen(8080);
@@ -41,11 +45,7 @@ expressModule.run = () => {
                         sendQuestions(res, status, result);
                     });
                 } else {
-                    res.json({
-                        message: 'error',
-                        error_code: '1000',
-                        error: 'Request must include id'
-                    });
+                    sendError(1000, res);
                 }
                 break;
             case 'cat':
@@ -56,17 +56,9 @@ expressModule.run = () => {
                         sendQuestions(res, status, result);
                     });
                 } else if (!req.query.cat) {
-                    res.json({
-                        message: 'error',
-                        error_code: 1001,
-                        error: 'Request must include category'
-                    });
+                    sendError(1001, res);
                 } else if (!req.query.limit) {
-                    res.json({
-                        message: 'error',
-                        error_code: 1002,
-                        error: 'Request must include limit'
-                    });
+                    sendError(1002, res);
                 }
                 break;
             case 'subcat':
@@ -77,17 +69,9 @@ expressModule.run = () => {
                         sendQuestions(res, status, result);
                     });
                 } else if (!req.query.subcat) {
-                    res.json({
-                        message: 'error',
-                        error_code: 1003,
-                        error: 'Request must include category'
-                    });
+                    sendError(1003, res);
                 } else if (!req.query.limit) {
-                    res.json({
-                        message: 'error',
-                        error_code: 1002,
-                        error: 'Request must include limit'
-                    });
+                    sendError(1002, res);
                 }
                 break;
             case 'param':
@@ -100,23 +84,11 @@ expressModule.run = () => {
                             sendQuestions(res, status, result);
                         });
                 } else if (!req.query.diffis) {
-                    res.json({
-                        message: 'error',
-                        error_code: 1004,
-                        error: 'Request must include difficulty list'
-                    });
+                    sendError(1004, res);
                 } else if (!req.query.subcats) {
-                    res.json({
-                        message: 'error',
-                        error_code: 1005,
-                        error: 'Request must include subcategory list'
-                    });
+                    sendError(1005, res);
                 } else if (!req.query.limit) {
-                    res.json({
-                        message: 'error',
-                        error_code: 1002,
-                        error: 'Request must include limit'
-                    });
+                    sendError(1002, res);
                 }
 
         }
@@ -172,7 +144,6 @@ expressModule.run = () => {
 
 expressModule.server = server;
 expressModule.app = app;
-
 
 
 module.exports = expressModule;
