@@ -105,3 +105,6 @@ dist
 
 # Webstorm IDE config
 .idea/
+
+# Credentials directory
+bagel_credentials/
