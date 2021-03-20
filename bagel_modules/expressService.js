@@ -1,16 +1,12 @@
 var expressModule = {}
-
 const express = require("express");
-
 const app = express();
-
 const questionService = require('./questionService');
-
 let errors = require('./errors.json');
 
 function sendQuestions(res, status, result) {
     if (status === 'ok') {
-        res.json({
+        res.status(200).json({
             message: 'success',
             data: result
         });
@@ -20,17 +16,24 @@ function sendQuestions(res, status, result) {
 }
 
 function sendError(code, res) {
-    res.json({
+    res.status(400).json({
         message: 'error',
         error: errors[code]
     });
 }
 
+function isJson(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
+
 let server = app.listen(8080);
 
-
 expressModule.run = () => {
-
 
     app.get("/", (req, res) => {
         res.sendStatus(200);
@@ -38,9 +41,13 @@ expressModule.run = () => {
 
     app.get("/api/tossups/", (req, res) => {
         switch (req.query.type) {
-            case 'id':
-                req.query.id = +req.query.id
+            case 'id': //Uses getTossupByID
                 if (req.query.id) {
+                    if (+req.query.id) {
+                        req.query.id = +req.query.id
+                    } else {
+                        sendError(1001, res);
+                    }
                     questionService.getTossupByID(req.query.id).then(({status, result}) => {
                         sendQuestions(res, status, result);
                     });
@@ -48,47 +55,69 @@ expressModule.run = () => {
                     sendError(1000, res);
                 }
                 break;
-            case 'cat':
-                req.query.cat = +req.query.cat;
-                req.query.limit = +req.query.limit;
+            case 'cat': //Uses getTossupByCategoryID
                 if (req.query.cat && req.query.limit) {
-                    questionService.getTossupsByCategoryID(req.query.cat, req.query.limit).then(({status, result}) => {
-                        sendQuestions(res, status, result);
-                    });
+                    if (+req.query.cat && +req.query.cat) {
+                        req.query.cat = +req.query.cat;
+                        req.query.limit = +req.query.limit;
+                        questionService.getTossupsByCategoryID(req.query.cat, req.query.limit)
+                            .then(({status, result}) => {
+                                sendQuestions(res, status, result);
+                            });
+                    } else if (!+req.query.cat) {
+                        sendError(1003, res);
+                    } else if (!+req.query.limit) {
+                        sendError(1007, res);
+                    }
                 } else if (!req.query.cat) {
-                    sendError(1001, res);
-                } else if (!req.query.limit) {
                     sendError(1002, res);
+                } else if (!req.query.limit) {
+                    sendError(1006, res);
                 }
                 break;
-            case 'subcat':
-                req.query.subcat = +req.query.subcat;
-                req.query.limit = +req.query.limit;
+            case 'subcat': //Uses getTossupBySubcatID
                 if (req.query.subcat && req.query.limit) {
-                    questionService.getTossupsBySubcatID(req.query.subcat, req.query.limit).then(({status, result}) => {
-                        sendQuestions(res, status, result);
-                    });
+                    if (+req.query.subcat && +req.query.limit) {
+                        req.query.subcat = +req.query.subcat;
+                        req.query.limit = +req.query.limit;
+                        questionService.getTossupsBySubcatID(req.query.subcat, req.query.limit)
+                            .then(({status, result}) => {
+                                sendQuestions(res, status, result);
+                            });
+                    } else if (!+req.query.subcat) {
+                        sendError(1005, res);
+                    } else if (!+req.query.limit) {
+                        sendError(1007, res);
+                    }
                 } else if (!req.query.subcat) {
-                    sendError(1003, res);
+                    sendError(1004, res);
                 } else if (!req.query.limit) {
-                    sendError(1002, res);
+                    sendError(1006, res);
                 }
                 break;
-            case 'param':
-                req.query.diffis = JSON.parse(req.query.diffis);
-                req.query.subcats = JSON.parse(req.query.subcats);
-                req.query.limit = +req.query.limit
+            case 'param': //Uses getTossupsByParameters
                 if (req.query.diffis && req.query.subcats && req.query.limit) {
-                    questionService.getTossupsByParameters(req.query.diffis, req.query.subcats, req.query.limit)
-                        .then(({status, result}) => {
-                            sendQuestions(res, status, result);
-                        });
+                    if (isJson(req.query.diffis) && isJson(req.query.subcats) && +req.query.limit) {
+                        req.query.diffis = JSON.parse(req.query.diffis);
+                        req.query.subcats = JSON.parse(req.query.subcats);
+                        req.query.limit = +req.query.limit
+                        questionService.getTossupsByParameters(req.query.diffis, req.query.subcats, req.query.limit)
+                            .then(({status, result}) => {
+                                sendQuestions(res, status, result);
+                            });
+                    } else if (!isJson(req.query.diffis)) {
+                        sendError(1009, res)
+                    } else if (!isJson(req.query.subcats)) {
+                        sendError(1011, res)
+                    } else if (!+req.query.limit) {
+                        sendError(1007, res)
+                    }
                 } else if (!req.query.diffis) {
-                    sendError(1004, res);
+                    sendError(1008, res);
                 } else if (!req.query.subcats) {
-                    sendError(1005, res);
+                    sendError(1010, res);
                 } else if (!req.query.limit) {
-                    sendError(1002, res);
+                    sendError(1006, res);
                 }
 
         }
@@ -96,47 +125,43 @@ expressModule.run = () => {
 
     app.get("/api/bonuses/", (req, res) => {
         switch (req.query.type) {
-            case 'id':
-                req.query.id = +req.query.id
+            case 'id': //Uses getBonusByID
                 if (req.query.id) {
+                    if (+req.query.id) {
+                        req.query.id = +req.query.id
+                    } else {
+                        sendError(1001, res);
+                    }
                     questionService.getBonusByID(req.query.id).then(({status, result}) => {
                         sendQuestions(res, status, result);
                     });
                 } else {
-                    res.json({
-                        message: 'error',
-                        error_code: '1000',
-                        error: 'Request must include id'
-                    });
+                    sendError(1000, res);
                 }
                 break;
-            case 'param':
-                req.query.diffis = JSON.parse(req.query.diffis);
-                req.query.subcats = JSON.parse(req.query.subcats);
-                req.query.limit = +req.query.limit
+            case 'param': //Uses getBonusessByParameters
                 if (req.query.diffis && req.query.subcats && req.query.limit) {
-                    questionService.getBonusesByParameters(req.query.diffis, req.query.subcats, req.query.limit)
-                        .then(({status, result}) => {
-                            sendQuestions(res, status, result);
-                        });
+                    if (isJson(req.query.diffis) && isJson(req.query.subcats) && +req.query.limit) {
+                        req.query.diffis = JSON.parse(req.query.diffis);
+                        req.query.subcats = JSON.parse(req.query.subcats);
+                        req.query.limit = +req.query.limit
+                        questionService.getBonusesByParameters(req.query.diffis, req.query.subcats, req.query.limit)
+                            .then(({status, result}) => {
+                                sendQuestions(res, status, result);
+                            });
+                    } else if (!isJson(req.query.diffis)) {
+                        sendError(1009, res)
+                    } else if (!isJson(req.query.subcats)) {
+                        sendError(1011, res)
+                    } else if (!+req.query.limit) {
+                        sendError(1007, res)
+                    }
                 } else if (!req.query.diffis) {
-                    res.json({
-                        message: 'error',
-                        error_code: 1004,
-                        error: 'Request must include difficulty list'
-                    });
+                    sendError(1008, res);
                 } else if (!req.query.subcats) {
-                    res.json({
-                        message: 'error',
-                        error_code: 1005,
-                        error: 'Request must include subcategory list'
-                    });
+                    sendError(1010, res);
                 } else if (!req.query.limit) {
-                    res.json({
-                        message: 'error',
-                        error_code: 1002,
-                        error: 'Request must include limit'
-                    });
+                    sendError(1006, res);
                 }
         }
     });
