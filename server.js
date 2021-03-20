@@ -2,4 +2,6 @@
 // Before your PR is accepted, you must write and pass your tests. (npm run test)
 // Server should be started with "npm run start".
 
+const expressModule = require("./bagel_modules/expressService");
 
+expressModule.run();

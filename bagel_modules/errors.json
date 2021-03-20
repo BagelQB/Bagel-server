@@ -1,0 +1,47 @@
+{
+  "0": {
+    "error_code": 0, "error_desc": "Could not establish connection"
+  },
+  "1": {
+    "error_code": 1, "error_desc": "No data found matching parameters"
+  },
+  "2": {
+    "error_code": 2, "error_desc": "Invalid parameters"
+  },
+  "1000": {
+    "error_code": 1000, "error_desc": "Request must include id"
+  },
+  "1001": {
+    "error_code": 1001, "error_desc": "Id must be an integer"
+  },
+  "1002": {
+    "error_code": 1002, "error_desc": "Request must include category"
+  },
+  "1003": {
+    "error_code": 1003, "error_desc": "Category must be an integer"
+  },
+  "1004": {
+    "error_code": 1004, "error_desc": "Request must include subcategory"
+  },
+  "1005": {
+    "error_code": 1005, "error_desc": "Subcategory must be an integer"
+  },
+  "1006": {
+    "error_code": 1006, "error_desc": "Request must include limit"
+  },
+  "1007": {
+    "error_code": 1007, "error_desc": "Limit must be an integer"
+  },
+  "1008": {
+    "error_code": 1008, "error_desc": "Request must include difficulty list"
+  },
+  "1009": {
+    "error_code": 1009, "error_desc": "Difficulty list must be an array"
+  },
+  "1010": {
+    "error_code": 1010, "error_desc": "Request must include subcategory list"
+  },
+  "1011": {
+    "error_code": 1011, "error_desc": "Subcategory list must be an array"
+  }
+}
