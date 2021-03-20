@@ -1,4 +1,4 @@
-var expressModule = {}
+let expressModule = {}
 const express = require("express");
 const app = express();
 const questionService = require('./questionService');

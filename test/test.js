@@ -12,7 +12,6 @@ let chaiHttp = require('chai-http');
 let should = chai.should();
 
 const questionService = require('../bagel_modules/questionService');
-const translatorService = require('../bagel_modules/translatorService');
 const expressService = require('../bagel_modules/expressService');
 expressService.run();
 chai.use(chaiHttp);
@@ -488,76 +487,7 @@ describe('Bagel Services', function () {
 
     });
 
-    describe('translatorService', function () {
-        describe('#tournamentFromID()', function () {
 
-
-            it('Properly returns tournament from id', function (done) {
-                translatorService.tournamentFromID(417).then(({status, result}) => {
-                    if (status && status === "ok") {
-                        if (result && result.id && result.id === 417) {
-                            done();
-                        } else {
-                            done("returned wrong tournament");
-                        }
-                    } else {
-                        done("Returned with 'fail' status");
-                    }
-
-                }).catch((err) => {
-                    done(err);
-                })
-            })
-
-
-        })
-
-        describe('#getTournamentsWithDifficulty()', function () {
-
-            var d1Tournament_count = 6;
-            it('Returns proper tournaments for difficulty 1', function (done) {
-                translatorService.getTournamentsWithDifficulty(1).then(({status, result}) => {
-                    if (status && status === "ok") {
-                        if (result.length === d1Tournament_count) {
-                            done();
-                        } else {
-                            done("Incorrect count");
-                        }
-                    } else {
-                        done("Returned with a result of fail")
-                    }
-
-
-                }).catch((err) => {
-                    done(err);
-                })
-            })
-        })
-
-
-        describe('#getTournamentsWithDifficultyList()', function () {
-            for (var i = 1; i < 10; i++) {
-                (function (cntr) {
-                    it('Returns proper tournaments for difficulty ' + cntr, function (done) {
-                        translatorService.getTournamentsWithDifficulty(cntr).then((res) => {
-                            translatorService.getTournamentsWithDifficultyList([cntr]).then((res2) => {
-                                if (res.result.length === res2.result.length) {
-                                    done();
-                                } else {
-                                    done("Incorrect count");
-                                }
-                            })
-                        })
-
-                    })
-                })(i);
-            }
-
-
-        })
-
-
-    })
 
     describe('expressService', function () {
 

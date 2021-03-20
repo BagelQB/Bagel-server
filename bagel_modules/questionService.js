@@ -1,7 +1,7 @@
 const Pool = require('pg').Pool
 qService = {};
 
-const translatorService = require('./translatorService');
+
 const errors = require('./errors.json');
 
 // SERVICE TO RETRIEVE QUESTIONS
