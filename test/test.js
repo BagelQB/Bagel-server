@@ -13,6 +13,8 @@ let should = chai.should();
 
 const questionService = require('../bagel_modules/questionService');
 const expressService = require('../bagel_modules/expressService');
+const dataService = require('../bagel_modules/dataService');
+
 expressService.run();
 chai.use(chaiHttp);
 
@@ -487,8 +489,6 @@ describe('Bagel Services', function () {
 
     });
 
-
-
     describe('expressService', function () {
 
 
@@ -842,6 +842,87 @@ describe('Bagel Services', function () {
             expressService.server.close();
         })
 
+
+    });
+
+    describe('dataService', function () {
+
+        it('Does not return an error for local path /tests (Should return undefined or null)', function (done) {
+
+            if(!dataService.getDB()) {
+                done(); // The database is empty.
+            }
+
+            if(!dataService.getDB().tests) {
+                done();
+            } else {
+                dataService.removeEntry("/tests").then(() => {
+                    done();
+                }).catch((err) => {
+                    done("Test directory on remote or on local db is not empty.");
+                })
+            }
+        })
+
+        describe('Entry creation and deletion', function () {
+            it('Creates and deletes entry {id: "test"} on path /tests', function (done) {
+                dataService.addEntry("/tests", {id: "test"}).then((res) => {
+                    dataService.removeEntry("/tests/" + res.key).then(() => {
+                        done();
+                    }).catch((err) => {
+                        done(err);
+                    })
+                }).catch((err) => {
+                    done(err);
+                })
+            })
+
+            it('Creates and deletes entry {id: "deep_test"} on path /tests/deep/test/path', function (done) {
+                dataService.addEntry("/tests/deep/test/path", {id: "deep_test"}).then((res) => {
+                    dataService.removeEntry("/tests/deep/test/path/" + res.key).then(() => {
+                        done();
+                    }).catch((err) => {
+                        done(err);
+                    })
+                }).catch((err) => {
+                    done(err);
+                })
+            })
+        })
+
+        describe('Data updates', function () {
+            it('Creates, updates, then deletes entry {id: "test"} on path /tests', function (done) {
+                dataService.addEntry("/tests", {id: "test"}).then((res) => {
+                    dataService.editEntry("/tests/" + res.key, {id: "test_edited"}).then(() => {
+                        dataService.removeEntry("/tests/" + res.key).then(() => {
+                            done();
+                        }).catch((err) => {
+                            done(err);
+                        })
+                    }).catch((err) => {
+                        done(err);
+                    })
+                }).catch((err) => {
+                    done(err);
+                })
+            })
+
+            it('Creates, updates, then deletes entry {id: "deep_test"} on path /tests/deep/test/path', function (done) {
+                dataService.addEntry("/tests/deep/test/path", {id: "deep_test"}).then((res) => {
+                    dataService.editEntry("/tests/deep/test/path/" + res.key, {id: "deep_test_edited"}).then(() => {
+                        dataService.removeEntry("/tests/deep/test/path/" + res.key).then(() => {
+                            done();
+                        }).catch((err) => {
+                            done(err);
+                        })
+                    }).catch((err) => {
+                        done(err);
+                    })
+                }).catch((err) => {
+                    done(err);
+                })
+            })
+        });
 
     });
 })
