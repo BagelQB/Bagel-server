@@ -36,17 +36,36 @@ ws.on('request', function(request) {
     }
 
     var connection = request.accept('echo-protocol', request.origin);
+    connection.isAlive = true;
     callBind(event.ws_connection_accept, request);
 
     connection.on('message', function(message) {
-        if(message.utf8Data.startsWith("ws_get")) {
-            callBind(event.get, {user: userDatabase[connection], message: message.utf8Data, netUser: connection});
+
+        let {header, data} = getObjFromPacket(message.utf8Data);
+
+        if(header === "ws_get") {
+            callBind(event.get, {user: userDatabase[connection], data: data, netUser: connection});
             return;
         }
 
-        if(message.utf8Data.startsWith("ws_post")) {
-            callBind(event.post, {user: userDatabase[connection], message: message.utf8Data, netUser: connection});
+        if(header === "ws_post") {
+            callBind(event.post, {user: userDatabase[connection], data: data, netUser: connection});
+            return;
         }
+
+        if(header === "ident") {
+            callBind(event.identify, {user: userDatabase[connection], data: data, netUser: connection});
+            return;
+        }
+
+        if(header === "ping") {
+            connection.isAlive = true;
+            connection.send(Packet("pong", data));
+            callBind(event.ping, {user: userDatabase[connection], data: data, netUser: connection});
+            return;
+        }
+
+        callBind(event.message, {user: userDatabase[connection], data: data});
 
     });
 
@@ -57,9 +76,20 @@ ws.on('request', function(request) {
 });
 
 
+const keepAliveInterval = setInterval(function ping() {
+    ws.connections.forEach(function each(client) {
+        if (client.isAlive === false) {
+            return client.close(1001, "Timeout");
+        }
 
+        client.isAlive = false;
+    });
+}, 5000);
 
-
+function getObjFromPacket(packetString) {
+    let [header, obj] = packetString.split(":ws:");
+    return {header: header, data: JSON.parse(obj)};
+}
 
 function Packet(header, data) {
     return header + ":ws:" + (JSON.stringify(data) || "null");
