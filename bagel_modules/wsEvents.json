@@ -1,0 +1,10 @@
+{
+  "ws_connection_accept": {"description": "Websocket connection event", "callback": "conn_accept"},
+  "ws_connection_reject": {"description": "Websocket connection rejected - usually due to unauthenticated origin.", "callback": "conn_reject"},
+  "get": {"description": "Request to get a resource from the server", "callback": "get"},
+  "post": {"description": "Request to set a resource on the server", "callback": "post"},
+  "ws_connection_drop": {"description": "Websocket connection dropped - usually due to a user leaving.", "callback": "conn_drop"},
+  "identify": {"description": "Gives some data identifying the websocket to the server", "callback": "ident"},
+  "ping": {"description": "Sends back the message so client and server can keep the connection alive, as well as provides information relating to the connection.", "callback": "ping"},
+  "message": {"description": "Generic message callback", "callback": "msg"}
+}

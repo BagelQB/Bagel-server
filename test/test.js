@@ -14,6 +14,7 @@ let should = chai.should();
 const questionService = require('../bagel_modules/questionService');
 const expressService = require('../bagel_modules/expressService');
 const dataService = require('../bagel_modules/dataService');
+const websocketService = require('../bagel_modules/websocketService');
 
 expressService.run();
 chai.use(chaiHttp);
@@ -843,6 +844,18 @@ describe('Bagel Services', function () {
         })
 
 
+    });
+
+    describe('websocketService', function () {
+        describe('Origin authentication', function () {
+            it('Does not authenticate undefined origin', function (done) {
+                if(websocketService.originAuth(undefined)) {
+                    done("Authenticated an undefined origin. This MUST be fixed before merge to prod.");
+                } else {
+                    done();
+                }
+            })
+        })
     });
 
     describe('dataService', function () {

@@ -33,8 +33,10 @@
   "dependencies": {
     "chai-http": "^4.3.0",
     "colors": "^1.4.0",
+    "cors": "^2.8.5",
     "express": "^4.17.1",
     "firebase-admin": "^9.5.0",
-    "pg": "^8.5.1"
+    "pg": "^8.5.1",
+    "websocket": "^1.0.33"
   }
 }
