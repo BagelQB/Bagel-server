@@ -3,12 +3,6 @@ const express = require("express");
 const app = express();
 const questionService = require('./questionService');
 let errors = require('./errors.json');
-let cors = require('cors')
-
-var corsOptions = {
-    origin: 'http://localhost:3000', // web app for testing
-    optionsSuccessStatus: 200
-}
 
 function sendQuestions(res, status, result) {
     if (status === 'ok') {
@@ -37,7 +31,13 @@ function isJson(str) {
     return true;
 }
 
-app.use(cors(corsOptions));
+app.use(function (req, res, next) {
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    next();
+});
 
 let server = app.listen(8080);
 
