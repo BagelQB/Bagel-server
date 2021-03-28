@@ -23,6 +23,8 @@ function authenticateOrigin(origin) {
     // This is only safe to merge if it is false.
 }
 
+
+
 let userDatabase = {};
 let userDatabase_inv = {};
 let callbacks = {};

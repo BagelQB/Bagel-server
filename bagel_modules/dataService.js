@@ -22,6 +22,10 @@ dataService.getDB = () => {
     return db;
 }
 
+dataService.addEntryWithName = (path, entryName, entry) => {
+    return remote.ref(path).update({[entryName]: entry});
+}
+
 dataService.addEntry = (path, entry) => {
     return remote.ref(path).push(entry);
 }

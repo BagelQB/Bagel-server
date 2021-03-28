@@ -497,7 +497,6 @@ describe('Bagel Services', function () {
             if (expressService.server) {
                 done();
             } else {
-
                 console.log("   - Some tests were not run because the express server could not start.".red.bold);
                 done("Express server did not start on port 8080");
             }
@@ -519,95 +518,12 @@ describe('Bagel Services', function () {
             }
         });
 
-        describe('expressService-questions', function () {
-            it('Returns a tossup on path "/api/tossups?type=id&id=59771"', function (done) {
-                this.timeout(5000);
-                if (!expressService.server) {
-                    done("Express server did not start")
-                } else {
-                    chai.request(expressService.app)
-                        .get('/api/tossups?type=id&id=59771')
-                        .end((err, res) => {
-                            res.should.have.status(200);
-                            done();
-                        });
-                }
-            });
+        describe('expressService users', function () {
 
-            it('Returns a bonus on path "/api/bonuses?type=id&id=498"', function (done) {
-                this.timeout(5000);
-                if (!expressService.server) {
-                    done("Express server did not start")
-                } else {
-                    chai.request(expressService.app)
-                        .get('/api/bonuses?type=id&id=498')
-                        .end((err, res) => {
-                            res.should.have.status(200);
-                            done();
-                        });
-                }
-            });
-
-            it('Returns 10 tossups on path /api/tossups?type=cat&cat=15&limit=10"', function (done) {
-                this.timeout(5000);
-                if (!expressService.server) {
-                    done("Express server did not start")
-                } else {
-                    chai.request(expressService.app)
-                        .get('/api/tossups?type=cat&cat=15&limit=10')
-                        .end((err, res) => {
-                            res.should.have.status(200);
-                            done();
-                        });
-                }
-            });
+        })
 
 
-            it('Returns 10 tossups on path /api/tossups?type=subcat&subcat=25&limit=10"', function (done) {
-                this.timeout(5000);
-                if (!expressService.server) {
-                    done("Express server did not start")
-                } else {
-                    chai.request(expressService.app)
-                        .get('/api/tossups?type=subcat&subcat=25&limit=10')
-                        .end((err, res) => {
-                            res.should.have.status(200);
-                            done();
-                        });
-                }
-            });
-
-            it('Returns 3 tossups on path /api/tossups?type=param&diffis=[1]&subcats=[4]&limit=3"', function (done) {
-                this.timeout(5000);
-                if (!expressService.server) {
-                    done("Express server did not start")
-                } else {
-                    chai.request(expressService.app)
-                        .get('/api/tossups?type=param&diffis=[1]&subcats=[4]&limit=3')
-                        .end((err, res) => {
-                            res.should.have.status(200);
-                            done();
-                        });
-                }
-            });
-
-            it('Returns 3 bonuses on path /api/bonuses?type=param&diffis=[3]&subcats=[4]&limit=3"', function (done) {
-                this.timeout(5000);
-                if (!expressService.server) {
-                    done("Express server did not start")
-                } else {
-                    chai.request(expressService.app)
-                        .get('/api/bonuses?type=param&diffis=[3]&subcats=[4]&limit=3')
-                        .end((err, res) => {
-                            res.should.have.status(200);
-                            done();
-                        });
-                }
-            });
-
-        });
-
-        describe('#expressService-errors', function () {
+        describe('#expressService errors', function () {
 
             // Missing ID
             it('Returns error 1000 on path "/api/bonuses?type=id&id="', function (done) {
@@ -627,6 +543,7 @@ describe('Bagel Services', function () {
                         });
                 }
             });
+
 
             // ID is not an integer
             it('Returns error 1001 on path "/api/bonuses?type=id&id=foo"', function (done) {
@@ -834,6 +751,82 @@ describe('Bagel Services', function () {
                         });
                 }
             });
+
+            // No uid and no auth code
+            it('Returns error 1012 on path "/api/users/"', function (done) {
+                this.timeout(5000);
+                if (!expressService.server) {
+                    done("Express server did not start")
+                } else {
+                    chai.request(expressService.app)
+                        .get('/api/users/')
+                        .end((err, res) => {
+                            res.should.have.status(400);
+                            if (JSON.parse(res.text).error.error_code === 1012) {
+                                done();
+                            } else {
+                                done("Returned wrong error code");
+                            }
+                        });
+                }
+            });
+
+            // no auth code
+            it('Returns error 1012 on path "/api/users/?uid=completeGibberishAUFHIAuFHIUAWGFYAGFAUIJFUIAW"', function (done) {
+                this.timeout(5000);
+                if (!expressService.server) {
+                    done("Express server did not start")
+                } else {
+                    chai.request(expressService.app)
+                        .get('/api/users/?uid=completeGibberishAUFHIAuFHIUAWGFYAGFAUIJFUIAW')
+                        .end((err, res) => {
+                            res.should.have.status(400);
+                            if (JSON.parse(res.text).error.error_code === 1012) {
+                                done();
+                            } else {
+                                done("Returned wrong error code");
+                            }
+                        });
+                }
+            });
+
+            // improper auth code
+            it('Returns error 1012 on path "/api/users/?uid=completeGibberishAUUIJFUIAW&auth=AUJHBFIYUAWGFUAHfUI"', function (done) {
+                this.timeout(5000);
+                if (!expressService.server) {
+                    done("Express server did not start")
+                } else {
+                    chai.request(expressService.app)
+                        .get('/api/users/?uid=completeGibberishAUFHIAuFHIUAWGFYAGFAUIJFUIAW&auth=AUJHBFIYUAWGFUAHfUI')
+                        .end((err, res) => {
+                            res.should.have.status(400);
+                            if (JSON.parse(res.text).error.error_code === 1012) {
+                                done();
+                            } else {
+                                done("Returned wrong error code");
+                            }
+                        });
+                }
+            });
+
+            // improper auth code
+            it('Returns error 1013 on path "/api/users/?auth=completeGibberishAUFHIAuFHIUAWGFYAGFAUIJFUIAW" (post)', function (done) {
+                this.timeout(5000);
+                if (!expressService.server) {
+                    done("Express server did not start")
+                } else {
+                    chai.request(expressService.app)
+                        .post('/api/users/?auth=completeGibberishAUFHIAuFHIUAWGFYAGFAUIJFUIAW')
+                        .end((err, res) => {
+                            res.should.have.status(400);
+                            if (JSON.parse(res.text).error.error_code === 1013) {
+                                done();
+                            } else {
+                                done("Returned wrong error code");
+                            }
+                        });
+                }
+            });
         });
 
         //http://localhost:8080/api/tossups?type=id&id=59771 - mindanao
@@ -881,6 +874,18 @@ describe('Bagel Services', function () {
             it('Creates and deletes entry {id: "test"} on path /tests', function (done) {
                 dataService.addEntry("/tests", {id: "test"}).then((res) => {
                     dataService.removeEntry("/tests/" + res.key).then(() => {
+                        done();
+                    }).catch((err) => {
+                        done(err);
+                    })
+                }).catch((err) => {
+                    done(err);
+                })
+            })
+
+            it('Creates and deletes entry {name: {id: "test"}} on path /tests', function (done) {
+                dataService.addEntryWithName("/tests", "name",{id: "test"}).then((res) => {
+                    dataService.removeEntry("/tests/name").then(() => {
                         done();
                     }).catch((err) => {
                         done(err);
