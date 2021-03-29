@@ -26,6 +26,7 @@ ws.bind(ws.event.ws_connection_drop, (data) => {
 })
 
 ws.bind(ws.event.ws_connection_reject, (data) => {
+    console.log(data.origin);
     wslog(" !! CONNECTION REJECTED ".bold.red + `[${data.remoteAddress}]`.cyan);
 })
 

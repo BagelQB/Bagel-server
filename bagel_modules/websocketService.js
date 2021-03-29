@@ -19,8 +19,9 @@ let ws = new Server({
 });
 
 function authenticateOrigin(origin) {
-    return false; // THIS MUST HAVE LOGIC TO AUTHENTICATE REQUEST ORIGINS IN PROD! DO NOT MERGE IF THE LOGIC DOES NOT EXIST.
-    // This is only safe to merge if it is false.
+    const secure_origins = ["http://localhost:3000"] // In order (LTR) : React testing endpoint / end
+    return secure_origins.includes(origin);
+    // THIS MUST HAVE LOGIC TO AUTHENTICATE REQUEST ORIGINS IN PROD! DO NOT MERGE IF THE LOGIC DOES NOT EXIST.
 }
 
 

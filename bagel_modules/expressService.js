@@ -35,14 +35,21 @@ function isJson(str) {
 }
 
 app.use(function (req, res, next) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
     res.setHeader('Access-Control-Allow-Credentials', true);
     next();
 });
 
+let newUser = (token) => {
+    return {name: token.name, email: token.email, email_verified: token.email_verified};
+}
+
+
 let server = app.listen(8080);
+
+
 
 expressModule.run = () => {
 
@@ -91,7 +98,8 @@ expressModule.run = () => {
                     // user already exists
                 } else {
                     //create user
-                    dataService.addEntryWithName("/users", decodedToken.uid, {name: "bruh"}).then((result) => {
+
+                    dataService.addEntryWithName("/users", decodedToken.uid, newUser(decodedToken)).then((result) => {
                         res.status(201).json({message: "Created account"})
                     }).catch((err) => {
                         console.log(err);
@@ -99,6 +107,7 @@ expressModule.run = () => {
                     })
                 }
             }).catch((err) => {
+                console.log(err);
                 sendError(1013, res);
             });
         } else {
