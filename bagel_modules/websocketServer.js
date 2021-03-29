@@ -3,6 +3,8 @@ let wsServer = {};
 const ws = require('../bagel_modules/websocketService');
 require("colors");
 
+console.log(console.log("[WSServer] SERVER START  ".bold + (new Date()).toString().gray));
+
 function wslog(msg) {
     console.log("[WSServer] ".bold + (new Date()).toString().gray + msg);
 }
@@ -24,6 +26,7 @@ ws.bind(ws.event.ws_connection_drop, (data) => {
 })
 
 ws.bind(ws.event.ws_connection_reject, (data) => {
+    console.log(data.origin);
     wslog(" !! CONNECTION REJECTED ".bold.red + `[${data.remoteAddress}]`.cyan);
 })
 

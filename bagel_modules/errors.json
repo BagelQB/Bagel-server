@@ -43,5 +43,17 @@
   },
   "1011": {
     "error_code": 1011, "error_desc": "Subcategory list must be an array"
+  },
+  "1012": {
+    "error_code": 1012, "error_desc": "Secure user db queries require a user id and a token"
+  },
+  "1013": {
+    "error_code": 1013, "error_desc": "Failed to validate JWT"
+  },
+  "1014": {
+    "error_code": 1014, "error_desc": "JWT does not correspond to account that is being accessed"
+  },
+  "1015": {
+    "error_code": 1015, "error_desc": "Account could not be found"
   }
 }

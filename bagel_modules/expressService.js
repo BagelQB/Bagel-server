@@ -2,6 +2,8 @@ let expressModule = {}
 const express = require("express");
 const app = express();
 const questionService = require('./questionService');
+let admin = require("firebase-admin");
+const dataService = require("./dataService");
 let errors = require('./errors.json');
 
 function sendQuestions(res, status, result) {
@@ -22,6 +24,7 @@ function sendError(code, res) {
     });
 }
 
+
 function isJson(str) {
     try {
         JSON.parse(str);
@@ -39,13 +42,79 @@ app.use(function (req, res, next) {
     next();
 });
 
+let newUser = (token) => {
+    return {name: token.name, email: token.email, email_verified: token.email_verified};
+}
+
+
 let server = app.listen(8080);
+
+
 
 expressModule.run = () => {
 
     app.get("/", (req, res) => {
         res.sendStatus(200);
     });
+
+    app.get("/api/users/", (req, res) => {
+        let uid = req.query.id;
+        let token = req.query.auth;
+
+
+        if(uid && token) {
+            admin.auth().verifyIdToken(token).then((decodedToken) => {
+                if(decodedToken.uid === uid) {
+                    const database = dataService.getDB();
+                    if (database && database.users && database.users[uid]) {
+                        res.status(200).json({
+                            message: 'success',
+                            data: database.users[uid]
+                        });
+                    } else {
+                        res.status(404).json({
+                            message: 'error',
+                            error: errors[1015]
+                        });
+                    }
+                } else {
+                    sendError(1014, res);
+                }
+            }).catch((err) => {
+                console.log(err);
+                sendError(1013, res);
+            })
+        } else {
+            sendError(1012, res);
+        }
+    });
+
+    app.post("/api/users/", (req, res) => {
+        if(req.query.auth) {
+            admin.auth().verifyIdToken(req.query.auth).then((decodedToken) => {
+                const database = dataService.getDB();
+                if (database && database.users && database.users[decodedToken.uid]) {
+                    res.status(503).json({message: "Account already exists"})
+                    // user already exists
+                } else {
+                    //create user
+
+                    dataService.addEntryWithName("/users", decodedToken.uid, newUser(decodedToken)).then((result) => {
+                        res.status(201).json({message: "Created account"})
+                    }).catch((err) => {
+                        console.log(err);
+                        res.status(500).json({message: "Could not create account", error: "a"});
+                    })
+                }
+            }).catch((err) => {
+                console.log(err);
+                sendError(1013, res);
+            });
+        } else {
+            sendError(1012, res);
+        }
+
+    })
 
     app.get("/api/tossups/", (req, res) => {
         switch (req.query.type) {

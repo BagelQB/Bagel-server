@@ -3,6 +3,7 @@
 // Server should be started with "npm run start".
 
 const expressModule = require("./bagel_modules/expressService");
+const wsModule = require("./bagel_modules/websocketServer");
 expressModule.run();
 
 
