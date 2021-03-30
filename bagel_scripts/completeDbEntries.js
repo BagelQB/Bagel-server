@@ -10,6 +10,8 @@ const pool = new Pool({
   port: 5432,
 });
 
+const cliProgress = require('cli-progress'); // To not slow down cli with copious console.logs
+
 var total_trials = 0;
 var rows_affected = 0;
 
@@ -18,20 +20,58 @@ function exitHandler(options, exitCode) {
     if (options.exit) process.exit();
 }
 
+console.log("\n\n    [DBCompletion] If this process seems to get stuck on 100%, it may be running cleanup. If this problem persists, you can try again or run syncDbEntries.js manually.\n\n\n".bold)
+
+const multibar = new cliProgress.MultiBar({
+	clearOnComplete: false,
+	hideCursor: true,
+	format: `    {type} [` + "{bar}".green.bold + `] {percentage}% | ETA: {eta}s | {value}/{total}`
+}, cliProgress.Presets.shades_grey);
+
+const interval = setInterval(() => {closeIfBarsDone()}, 250);
+
+function closeIfBarsDone() {
+
+	if(multibar.bars.length < 4) return;
+
+	let barStillGoing = false;
+	for(var i = 0; i < multibar.bars.length; i++) {
+		if(multibar.bars[i].value < multibar.bars[i].total) {
+			barStillGoing = true;
+		}
+	}
+
+	if(!barStillGoing) {
+		clearInterval(interval);
+		process.exit(0);
+	}
+
+}
+
+
+
+
 //do something when app is closing
 process.on('exit', exitHandler.bind(null,{cleanup:true}));
 
 pool.query('ALTER TABLE tossups ADD COLUMN IF NOT EXISTS difficulty integer', (err, res) => {
 	pool.query("SELECT id, difficulty FROM tournaments", (err, res) => {
+		const b1 = multibar.create(res.rows.length, 0, {type: "Tossups"});
+
+
 		res.rows.forEach(({id, difficulty}, i) => {
 			total_trials += 1;
 			const query = `UPDATE tossups SET difficulty = ${difficulty} WHERE tournament_id = ${id}`;
 			pool.query(query, (err2, res2) => {
 				if(res2) {
 					rows_affected += res2.rowCount;
-					console.log(`[Tossups - ${i+1}/${res.rowCount}]`.bold + " <> UPDATE".yellow.bold + ` (Rows affected: ${res2.rowCount})`.grey);
+					//console.log(`[Tossups - ${i+1}/${res.rowCount}]`.bold + " <> UPDATE".yellow.bold + ` (Rows affected: ${res2.rowCount})`.grey);
 				} else {
-					console.log(`[Tossups - ${i+1}/${res.rowCount}]`.bold + " ! UPDATE FAILED".red.bold + ` {${query}}`.bold);
+					//console.log(`[Tossups - ${i+1}/${res.rowCount}]`.bold + " ! UPDATE FAILED".red.bold + ` {${query}}`.bold);
+				}
+				b1.increment();
+				if(b1.value >= b1.total) {
+					b1.stop();
 				}
 
 			})
@@ -51,32 +91,47 @@ ADD COLUMN IF NOT EXISTS part3_answer text
 `
 
 pool.query(query, (err, res) => {
+
+
 	pool.query("SELECT id, difficulty FROM tournaments", (err, res) => {
+
+		const b1 = multibar.create(res.rows.length, 0, {type: "Bonuses"});
+
 		res.rows.forEach(({id, difficulty}, i) => {
 			total_trials += 1;
 			const query = `UPDATE bonuses SET difficulty = ${difficulty} WHERE tournament_id = ${id}`;
 			pool.query(query, (err2, res2) => {
 				if(res2) {
 					rows_affected += res2.rowCount;
-					console.log(`[Bonuses - ${i+1}/${res.rowCount}]`.bold + " <> UPDATE".yellow.bold + ` (Rows affected: ${res2.rowCount})`.grey);
+					//console.log(`[Bonuses - ${i+1}/${res.rowCount}]`.bold + " <> UPDATE".yellow.bold + ` (Rows affected: ${res2.rowCount})`.grey);
 				} else {
-					console.log(`[Bonuses - ${i+1}/${res.rowCount}]`.bold + " ! UPDATE FAILED".red.bold + ` {${query}}`.bold);
+					//console.log(`[Bonuses - ${i+1}/${res.rowCount}]`.bold + " ! UPDATE FAILED".red.bold + ` {${query}}`.bold);
 				}
-
+				b1.increment();
+				if(b1.value >= b1.total) {
+					b1.stop();
+				}
 			})
 		})
 	});
 
 	pool.query("SELECT bonus_id, number, formatted_text, formatted_answer FROM bonus_parts", (err, res) => {
+
+		const b1 = multibar.create(res.rows.length, 0, {type: "Bonus parts"});
+
 		res.rows.forEach(({bonus_id, number, formatted_text, formatted_answer}, i) => {
 			total_trials += 1;
 			const query = `UPDATE bonuses SET part${number}_text = '${formatted_text.replace(/'/ig, "''")}', part${number}_answer = '${formatted_answer.replace(/'/ig, "''")}' WHERE id = ${bonus_id}`;
 			pool.query(query, (err2, res2) => {
 				if(res2) {
 					rows_affected += res2.rowCount;
-					console.log(`[Bonus parts - ${i+1}/${res.rowCount}]`.bold + " <> UPDATE".yellow.bold + ` (Rows affected: ${res2.rowCount})`.grey);
+					//console.log(`[Bonus parts - ${i+1}/${res.rowCount}]`.bold + " <> UPDATE".yellow.bold + ` (Rows affected: ${res2.rowCount})`.grey);
 				} else {
-					console.log(`[Bonus parts - ${i+1}/${res.rowCount}]`.bold + " ! UPDATE FAILED".red.bold + ` {${query}}`.bold);
+					//console.log(`[Bonus parts - ${i+1}/${res.rowCount}]`.bold + " ! UPDATE FAILED".red.bold + ` {${query}}`.bold);
+				}
+				b1.increment();
+				if(b1.value >= b1.total) {
+					b1.stop();
 				}
 			})
 		})
@@ -92,14 +147,17 @@ function tenify(num) {
 }
 
 function populate(cat_id, subcat_id) {
+
+
+
 	total_trials += 1;
 	const query = `UPDATE tossups SET subcategory_id = ${subcat_id} WHERE category_id = ${cat_id} AND subcategory_id IS NULL`;
 	pool.query(query, (err2, res2) => {
 		if(res2) {
 			rows_affected += res2.rowCount;
-			console.log(`[Subcategories-Tossups]`.bold + " <> UPDATE".yellow.bold + ` (Rows affected: ${res2.rowCount})`.grey);
+			//console.log(`[Subcategories-Tossups]`.bold + " <> UPDATE".yellow.bold + ` (Rows affected: ${res2.rowCount})`.grey);
 		} else {
-			console.log(`[Subcategories-Tossups]`.bold + " ! UPDATE FAILED".red.bold + ` {${query}}`.bold);
+			//console.log(`[Subcategories-Tossups]`.bold + " ! UPDATE FAILED".red.bold + ` {${query}}`.bold);
 		}
 
 	});
@@ -109,15 +167,18 @@ function populate(cat_id, subcat_id) {
 	pool.query(query2, (err2, res2) => {
 		if(res2) {
 			rows_affected += res2.rowCount;
-			console.log(`[Subcategories-Bonuses]`.bold + " <> UPDATE".yellow.bold + ` (Rows affected: ${res2.rowCount})`.grey);
+			//console.log(`[Subcategories-Bonuses]`.bold + " <> UPDATE".yellow.bold + ` (Rows affected: ${res2.rowCount})`.grey);
 		} else {
-			console.log(`[Subcategories-Bonuses]`.bold + " ! UPDATE FAILED".red.bold + ` {${query2}}`.bold);
+			//console.log(`[Subcategories-Bonuses]`.bold + " ! UPDATE FAILED".red.bold + ` {${query2}}`.bold);
 		}
 
 	});
 }
 
 pool.query("SELECT id, name FROM categories", (err, res) => {
+
+	const b1 = multibar.create(res.rows.length, 0, {type: "Subcategories"});
+
 	res.rows.forEach(({id, name}) => {
 		var misc_subcat_id = "1" + tenify(id);
 		pool.query("SELECT * FROM subcategories WHERE id = " + misc_subcat_id, (err, res) => {
@@ -128,6 +189,10 @@ pool.query("SELECT id, name FROM categories", (err, res) => {
 					});
 				} else {
 					populate(id, misc_subcat_id);
+				}
+				b1.increment();
+				if(b1.value >= b1.total) {
+					b1.stop();
 				}
 			}
 		});

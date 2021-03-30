@@ -11,7 +11,7 @@ db.list({include_docs: true}).then((doclist) => {
 
 	const totalDocs = doclist.rows.length;
 
-	const bar1 = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
+	const bar1 = new cliProgress.SingleBar({format: `    Test [` + "{bar}".green.bold + `] {percentage}% | ETA: {eta}s | {value}/{total}`}, cliProgress.Presets.shades_classic);
 
 	bar1.start(totalDocs, 0);
 

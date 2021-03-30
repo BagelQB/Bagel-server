@@ -38,8 +38,8 @@ function insert(totalTu, totalB) {
 
     const multibar = new cliProgress.MultiBar({
         clearOnComplete: false,
-        hideCursor: true
-
+        hideCursor: true,
+        format: `    {type} [` + "{bar}".green.bold + `] {percentage}% | ETA: {eta}s | {value}/{total}`
     }, cliProgress.Presets.shades_grey);
 
 
@@ -49,8 +49,8 @@ function insert(totalTu, totalB) {
 
 
 
-    b1.start(totalTu, 0);
-    b2.start(totalB, 0);
+    b1.start(totalTu, 0, {type: "Tossups"});
+    b2.start(totalB, 0, {type: "Bonuses"});
 
 
 
