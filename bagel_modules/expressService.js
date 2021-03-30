@@ -81,7 +81,6 @@ expressModule.run = () => {
                     sendError(1014, res);
                 }
             }).catch((err) => {
-                console.log(err);
                 sendError(1013, res);
             })
         } else {
@@ -102,12 +101,10 @@ expressModule.run = () => {
                     dataService.addEntryWithName("/users", decodedToken.uid, newUser(decodedToken)).then((result) => {
                         res.status(201).json({message: "Created account"})
                     }).catch((err) => {
-                        console.log(err);
                         res.status(500).json({message: "Could not create account", error: "a"});
                     })
                 }
             }).catch((err) => {
-                console.log(err);
                 sendError(1013, res);
             });
         } else {
