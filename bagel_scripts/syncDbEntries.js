@@ -106,7 +106,7 @@ function insert(totalTu, totalB) {
             }
         });
     });
-    
+
 }
 
 
