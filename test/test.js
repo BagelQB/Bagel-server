@@ -29,6 +29,7 @@ describe('Bagel Services', function () {
             var q4ID = "not_an_int";
 
             it('Return proper status code and tossup for id ' + q1ID, function (done) {
+                this.timeout(30000);
                 questionService.getTossupByID(q1ID).then(({status, result}) => {
                     if (status && result) {
                         if (status === "ok") {
@@ -47,6 +48,7 @@ describe('Bagel Services', function () {
             });
 
             it('Return proper status code and tossup for id ' + q2ID, function (done) {
+                this.timeout(30000);
                 questionService.getTossupByID(q2ID).then(({status, result}) => {
                     if (status && result) {
                         if (status === "ok") {

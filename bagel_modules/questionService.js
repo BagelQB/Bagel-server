@@ -15,16 +15,28 @@ const pool = new Pool({
   port: 5432,
 })
 
+const nano = require('nano')('http://admin:admin@localhost:5984'); // Insert your own couchdb credentials here.
+const db = nano.use('bagel-qb');
+
 qService.getTossupByID = (id) => {
 	return new Promise((resolve, reject) => {
 		if(Number.isInteger(id)) {
+			db.find({
+				selector: {
+					id: {"$eq": id}
+				},
+				limit: 1
+			}).then((res) => {
+				resolve({status: "ok", result: res.docs[0]});
+			})
+			/*
 			pool.query("SELECT * FROM tossups WHERE id = " + id.toString() + " LIMIT 1", (err, res) => {
 				if(res.rows[0]) {
 					resolve({status: "ok", result: res.rows[0]});
 				} else {
 					resolve({status: "fail", result: errors["1"]});
 				}
-			});
+			});*/
 		} else {
 			resolve({status: "fail", result: errors["2"]});
 		}
