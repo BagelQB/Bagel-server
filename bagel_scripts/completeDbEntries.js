@@ -1,5 +1,5 @@
 // Completes tossup and bonus entries in postgres.
-const colors = require('colors'); // for ease of debugging
+require('colors'); // for ease of debugging
 
 const Pool = require('pg').Pool
 const pool = new Pool({
@@ -20,12 +20,21 @@ function exitHandler(options, exitCode) {
     if (options.exit) process.exit();
 }
 
+function formatter(options, params, payload){
+	const bar =  "[" + options.barCompleteString.substr(0, Math.round(params.progress*options.barsize) - 1).green.dim + (options.barsize - Math.round(params.progress*options.barsize) === 0 ? "" : options.barCompleteString.substr(0,1).green.bold) + options.barIncompleteString.substr(0, options.barsize-Math.round(params.progress*options.barsize)) + "]";
+	if (params.value >= params.total){
+		return '    # ' + payload.type.green + '   ' + (params.value + '/' + params.total) + "  " + bar;
+	}else{
+		return '    # ' + payload.type.grey + '   ' + (params.value + '/' + params.total) + "  " + bar;
+	}
+}
+
 console.log("\n\n    [DBCompletion] If this process seems to get stuck on 100%, it may be running cleanup. If this problem persists, you can try again or run syncDbEntries.js manually.\n\n\n".bold)
 
 const multibar = new cliProgress.MultiBar({
 	clearOnComplete: false,
 	hideCursor: true,
-	format: `    {type} [` + "{bar}".green.bold + `] {percentage}% | ETA: {eta}s | {value}/{total}`
+	format: formatter
 }, cliProgress.Presets.shades_grey);
 
 const interval = setInterval(() => {closeIfBarsDone()}, 250);
