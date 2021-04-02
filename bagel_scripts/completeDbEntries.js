@@ -15,11 +15,20 @@ const cliProgress = require('cli-progress'); // To not slow down cli with copiou
 var total_trials = 0;
 var rows_affected = 0;
 
-function exitHandler(options, exitCode) {
-    if (options.cleanup) console.log('\n\n   DB COMPLETION COMPLETE:'.bold + `\n   ENTRIES SEARCHED: ${total_trials}`.bold + `\n   ROWS UPDATED: ${rows_affected}`.yellow.bold);
-    if (options.exit) process.exit();
+/**
+ * Handler to send text to the terminal before the process ends
+ */
+function exitHandler() {
+    console.log('\n\n   DB COMPLETION COMPLETE:'.bold + `\n   ENTRIES SEARCHED: ${total_trials}`.bold + `\n   ROWS UPDATED: ${rows_affected}`.yellow.bold);
 }
 
+/**
+ * Function to format progress bars
+ * @param {Object} options - cli-progress bar options.
+ * @param {Object} params - cli-progress bar values.
+ * @param {Object} payload - cli-progress user set values.
+ * @returns {String} - format string for the progress bar.
+ */
 function formatter(options, params, payload){
 	const bar =  "[" + options.barCompleteString.substr(0, Math.round(params.progress*options.barsize) - 1).green.dim + (options.barsize - Math.round(params.progress*options.barsize) === 0 ? "" : options.barCompleteString.substr(0,1).green.bold) + options.barIncompleteString.substr(0, options.barsize-Math.round(params.progress*options.barsize)) + "]";
 	if (params.value >= params.total){
@@ -39,8 +48,10 @@ const multibar = new cliProgress.MultiBar({
 
 const interval = setInterval(() => {closeIfBarsDone()}, 250);
 
+/**
+ * Function to end the process if all progress bars are finished.
+ */
 function closeIfBarsDone() {
-
 	if(multibar.bars.length < 4) return;
 
 	let barStillGoing = false;
@@ -61,7 +72,7 @@ function closeIfBarsDone() {
 
 
 //do something when app is closing
-process.on('exit', exitHandler.bind(null,{cleanup:true}));
+process.on('exit', exitHandler);
 
 pool.query('ALTER TABLE tossups ADD COLUMN IF NOT EXISTS difficulty integer', (err, res) => {
 	pool.query("SELECT id, difficulty FROM tournaments", (err, res) => {
@@ -147,7 +158,11 @@ pool.query(query, (err, res) => {
 	})
 });
 
-
+/**
+ * Add a 0 to a number if it's below 10 and turn it into a string
+ * @param {int} num - The number to "tenify"
+ * @returns {String} - The formatted number string.
+ */
 function tenify(num) {
 	if(num < 10) {
 		return "0" + num;
@@ -155,10 +170,12 @@ function tenify(num) {
 	return num.toString();
 }
 
+/**
+ * Add a placeholder subcategory id to tossups and bonuses that do not have them.
+ * @param {int} cat_id - The category id to search trhough
+ * @param {int} subcat_id - The subcategory id to set.
+ */
 function populate(cat_id, subcat_id) {
-
-
-
 	total_trials += 1;
 	const query = `UPDATE tossups SET subcategory_id = ${subcat_id} WHERE category_id = ${cat_id} AND subcategory_id IS NULL`;
 	pool.query(query, (err2, res2) => {

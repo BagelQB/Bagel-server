@@ -27,6 +27,11 @@ pool.query(query, (err, res) => {
 	console.log(`[Bonuses]`.bold + " - DROP".red.bold);
 })
 
+/**
+ * Add a 0 to a number if it's below 10 and turn it into a string (DRY alert)
+ * @param {int} num - The number to "tenify"
+ * @returns {String} - The formatted number string.
+ */
 function tenify(num) {
 	if(num < 10) {
 		return "0" + num;

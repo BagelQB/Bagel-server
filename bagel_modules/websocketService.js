@@ -18,6 +18,11 @@ let ws = new Server({
     autoAcceptConnections: false
 });
 
+/**
+ * Function to validate if an origin should be allowed to connect to the websocket server. This must authenticate properly before release to prod.
+ * @param {String} origin - The origin of the connection.
+ * @returns {Boolean} - If this origin should be allowed to connect to the websocket server.
+ */
 function authenticateOrigin(origin) {
     const secure_origins = ["http://localhost:3000"] // In order (LTR) : React testing endpoint / end
     return secure_origins.includes(origin);
@@ -89,21 +94,43 @@ const keepAliveInterval = setInterval(function ping() {
     });
 }, 5000);
 
+
+/**
+ * Decodes a websocket packet
+ * @param {String} packetString - The packet data
+ * @returns {Object} - The decoded header and data of the packet.
+ */
 function getObjFromPacket(packetString) {
     let [header, obj] = packetString.split(":ws:");
     return {header: header, data: JSON.parse(obj)};
 }
 
+/**
+ * Makes a string from header and a data object.
+ * @param {String} header - The header of the packet.
+ * @param {Object} data - The data to be sent.
+ * @returns {String} - The websocket packet
+ */
 function Packet(header, data) {
     return header + ":ws:" + (JSON.stringify(data) || "null");
 }
 
+/**
+ * Calls a bound function (for abstractions on top of this service)
+ * @param {WebsocketEvent} event - The event.
+ * @param {Object} data - The data to be sent to the bound function.
+ */
 function callBind(event, data) {
     const list = callbacks[event.callback];
     if(!list) return;
     list.forEach(func => func(data));
 }
 
+/**
+ * Bind a function to a websocket event
+ * @param {WebsocketEvent} event - The event.
+ * @param {Function} func - The function to bind.
+ */
 wsService.bind = (event, func) => {
     if(callbacks[event.callback]) {
         let list = callbacks[event.callback];
@@ -116,6 +143,11 @@ wsService.bind = (event, func) => {
 
 wsService.event = event;
 
+/**
+ * Export to test the origin authentication
+ * @param {String} origin - The origin to test.
+ * @returns {Boolean} If the origin will be authenticated.
+ */
 wsService.originAuth = (origin) => {
     return authenticateOrigin(origin);
 }

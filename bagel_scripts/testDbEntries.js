@@ -27,6 +27,13 @@ pool.query('SELECT COUNT(*) FROM tossups', (err, res) => {
 	})
 })
 
+/**
+ * Function to format progress bars (DRY alert)
+ * @param {Object} options - cli-progress bar options.
+ * @param {Object} params - cli-progress bar values.
+ * @param {Object} payload - cli-progress user set values.
+ * @returns {String} - format string for the progress bar.
+ */
 function formatter(options, params, payload){
 	const bar =  "[" + options.barCompleteString.substr(0, Math.round(params.progress*options.barsize) - 1).green.dim + (options.barsize - Math.round(params.progress*options.barsize) === 0 ? "" : options.barCompleteString.substr(0,1).green.bold) + options.barIncompleteString.substr(0, options.barsize-Math.round(params.progress*options.barsize)) + "]";
 	if (params.value >= params.total){
@@ -36,6 +43,10 @@ function formatter(options, params, payload){
 	}
 }
 
+/**
+ * Function to test database values
+ * @param {int} max - The amount of entries that will be tested
+ */
 function test(max) {
 	bar1.start(max, 0, {type: "Test"});
 	pool.query('SELECT * FROM tossups', (err, res) => {
@@ -100,21 +111,12 @@ function test(max) {
 
 
 
-
+/**
+ * Handler to send text to the terminal before the process ends
+ */
 function exitHandler(options, exitCode) {
-    if (options.cleanup) console.log('\n\n   DB TEST COMPLETE:'.bold + `\n   TOTAL TRIALS: ${total_trials}`.bold + `\n   PASSED: ${total_pass}`.green.bold + `\n   FAILED: ${total_fail}`.red.bold + `\n   UNTESTED: ${total_untested}`.magenta.bold);
-    if (options.exit) process.exit();
+    console.log('\n\n   DB TEST COMPLETE:'.bold + `\n   TOTAL TRIALS: ${total_trials}`.bold + `\n   PASSED: ${total_pass}`.green.bold + `\n   FAILED: ${total_fail}`.red.bold + `\n   UNTESTED: ${total_untested}`.magenta.bold);
 }
 
 
-//do something when app is closing
-process.on('exit', exitHandler.bind(null,{cleanup:true}));
-
-/*
-
-
-
-
-
-
-*/
+process.on('exit', exitHandler);
