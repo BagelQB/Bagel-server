@@ -10,6 +10,7 @@ const errors = require('./errors.json');
 const pool = new Pool({
   user: 'postgres',
   host: 'localhost',
+  client_encoding: "UTF8",
   database: 'BagelQB',
   password: 'postgres',
   port: 5432,
@@ -93,7 +94,7 @@ qService.getTossupsByParameters = (difficulty_list, subcat_id_list, limit) => {
 		if(Array.isArray(difficulty_list) && Array.isArray(subcat_id_list) && Number.isInteger(limit)) {
 
 			var category_query = subcat_id_list.join(" OR subcategory_id = ");
-			var difficulty_query = subcat_id_list.join(" OR difficulty = ");
+			var difficulty_query = difficulty_list.join(" OR difficulty = ");
 
 			pool.query("SELECT * FROM tossups WHERE (subcategory_id = " + category_query + ") AND (difficulty = " + difficulty_query + ") ORDER BY RANDOM() LIMIT " + limit, (err, res) => {
 				if(res && res.rows && res.rows[0]) {
@@ -150,7 +151,7 @@ qService.getBonusesByParameters = (difficulty_list, subcat_id_list, limit) => {
 		if(Array.isArray(difficulty_list) && Array.isArray(subcat_id_list) && Number.isInteger(limit)) {
 
 			var category_query = subcat_id_list.join(" OR subcategory_id = ");
-			var difficulty_query = subcat_id_list.join(" OR difficulty = ");
+			var difficulty_query = difficulty_list.join(" OR difficulty = ");
 
 			pool.query("SELECT * FROM bonuses WHERE (subcategory_id = " + category_query + ") AND (difficulty = " + difficulty_query + ") ORDER BY RANDOM() LIMIT " + limit, (err, res) => {
 				if(res && res.rows && res.rows[0]) {
