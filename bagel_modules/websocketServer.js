@@ -31,7 +31,7 @@ ws.bind(ws.event.ws_connection_reject, (data) => {
 })
 
 ws.bind(ws.event.ping, (data) => {
-    wslog(" ? PING ".blue.bold + `[${data.netUser.remoteAddress}]`.cyan);
+    //wslog(" ? PING ".blue.bold + `[${data.netUser.remoteAddress}]`.cyan);
 })
 
 

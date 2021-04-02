@@ -6,8 +6,7 @@
   "scripts": {
     "test": "mocha",
     "start": "node server.js",
-    "precomplete": "node ./bagel_scripts/completeDbEntries.js",
-    "complete": "node ./bagel_scripts/syncDbEntries.js",
+    "complete": "node ./bagel_scripts/completeDbEntries.js",
     "postcomplete": "node ./bagel_scripts/testDbEntries.js"
   },
   "repository": {
@@ -39,7 +38,6 @@
     "colors": "^1.4.0",
     "express": "^4.17.1",
     "firebase-admin": "^9.5.0",
-    "nano": "^9.0.3",
     "pg": "^8.5.1",
     "websocket": "^1.0.33"
   }
