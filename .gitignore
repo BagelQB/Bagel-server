@@ -108,3 +108,6 @@ dist
 
 # Credentials directory
 bagel_credentials/
+
+# Generated app data
+generated_data/*
