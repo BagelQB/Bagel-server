@@ -7,7 +7,8 @@
     "test": "mocha",
     "start": "node server.js",
     "complete": "node ./bagel_scripts/completeDbEntries.js",
-    "postcomplete": "node ./bagel_scripts/testDbEntries.js"
+    "postcomplete": "node ./bagel_scripts/testDbEntries.js",
+    "generate": "node ./bagel_scripts/generateAppData.js"
   },
   "repository": {
     "type": "git",
