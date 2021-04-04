@@ -6,6 +6,12 @@ let admin = require("firebase-admin");
 const dataService = require("./dataService");
 let errors = require('./errors.json');
 
+/**
+ * Function to send send questions to a client.
+ * @param {Response<any, Record<string, any>>} res - Express response object
+ * @param {String} status - The status string for the request
+ * @param {Object} result - The questions to send
+ */
 function sendQuestions(res, status, result) {
     if (status === 'ok') {
         res.status(200).json({
@@ -17,6 +23,11 @@ function sendQuestions(res, status, result) {
     }
 }
 
+/**
+ * Function to send an error given an error code.
+ * @param {int} code - The number of the code to send
+ * @param {Response<any, Record<string, any>>} res - Express response object
+ */
 function sendError(code, res) {
     res.status(400).json({
         message: 'error',
@@ -24,7 +35,11 @@ function sendError(code, res) {
     });
 }
 
-
+/**
+ * Function to determine if an object can be parsed to JSON.
+ * @param {String} str - The string to check.
+ * @returns {Boolean} - If this string can be converted into a json object.
+ */
 function isJson(str) {
     try {
         JSON.parse(str);
@@ -42,6 +57,11 @@ app.use(function (req, res, next) {
     next();
 });
 
+/**
+ * Function to create a JSON object to represent a new user.
+ * @param {DecodedIdToken} token - The decoded firebase token.
+ * @returns {Object} - The new user JSON object
+ */
 let newUser = (token) => {
     return {name: token.name, email: token.email, email_verified: token.email_verified};
 }
@@ -50,7 +70,9 @@ let newUser = (token) => {
 let server = app.listen(8080);
 
 
-
+/**
+ * Function to set up all of the express endpoints.
+ */
 expressModule.run = () => {
 
     app.get("/", (req, res) => {
@@ -81,7 +103,6 @@ expressModule.run = () => {
                     sendError(1014, res);
                 }
             }).catch((err) => {
-                console.log(err);
                 sendError(1013, res);
             })
         } else {
@@ -102,12 +123,10 @@ expressModule.run = () => {
                     dataService.addEntryWithName("/users", decodedToken.uid, newUser(decodedToken)).then((result) => {
                         res.status(201).json({message: "Created account"})
                     }).catch((err) => {
-                        console.log(err);
                         res.status(500).json({message: "Could not create account", error: "a"});
                     })
                 }
             }).catch((err) => {
-                console.log(err);
                 sendError(1013, res);
             });
         } else {

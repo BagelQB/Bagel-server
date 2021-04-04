@@ -5,6 +5,10 @@ require("colors");
 
 console.log(console.log("[WSServer] SERVER START  ".bold + (new Date()).toString().gray));
 
+/**
+ * Function to format a log message for the websocket server
+ * @param {String} msg - The message to send
+ */
 function wslog(msg) {
     console.log("[WSServer] ".bold + (new Date()).toString().gray + msg);
 }
@@ -31,7 +35,7 @@ ws.bind(ws.event.ws_connection_reject, (data) => {
 })
 
 ws.bind(ws.event.ping, (data) => {
-    wslog(" ? PING ".blue.bold + `[${data.netUser.remoteAddress}]`.cyan);
+    //wslog(" ? PING ".blue.bold + `[${data.netUser.remoteAddress}]`.cyan);
 })
 
 
